@@ -33,10 +33,16 @@ document.addEventListener('DOMContentLoaded', function() {
 class NetworkAnimation {
     constructor() {
         this.canvas = document.getElementById('networkCanvas');
-        this.ctx = this.canvas.getContext('2d');
+        this.ctx = this.canvas.getContext('2d', { alpha: true, antialias: false });
         this.nodes = [];
         this.connections = [];
         this.mousePos = { x: 0, y: 0 };
+        this.isMobile = window.innerWidth <= 768;
+        this.frameSkip = this.isMobile ? 2 : 1; // Skip frames on mobile
+        this.frameCount = 0;
+        this.lastFrameTime = 0;
+        this.targetFPS = this.isMobile ? 30 : 60;
+        this.frameInterval = 1000 / this.targetFPS;
         
         this.init();
         this.setupEventListeners();
@@ -54,17 +60,17 @@ class NetworkAnimation {
     }
     
     createNodes() {
-        const nodeCount = 50;
+        const nodeCount = this.isMobile ? 25 : 50;
         this.nodes = [];
         
         for (let i = 0; i < nodeCount; i++) {
             this.nodes.push({
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
-                vx: (Math.random() - 0.5) * 0.5,
-                vy: (Math.random() - 0.5) * 0.5,
-                radius: Math.random() * 3 + 1,
-                opacity: Math.random() * 0.5 + 0.2
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                radius: Math.random() * 2 + 0.5,
+                opacity: Math.random() * 0.4 + 0.15
             });
         }
     }
@@ -113,11 +119,20 @@ class NetworkAnimation {
     }
     
     animate() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.updateNodes();
-        this.drawConnections();
-        this.drawNodes();
-        requestAnimationFrame(() => this.animate());
+        requestAnimationFrame((currentTime) => {
+            const elapsed = currentTime - this.lastFrameTime;
+            
+            // Throttle frame updates on mobile
+            if (elapsed >= this.frameInterval) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.updateNodes();
+                this.drawConnections();
+                this.drawNodes();
+                this.lastFrameTime = currentTime;
+            }
+            
+            this.animate();
+        });
     }
     
     setupEventListeners() {
