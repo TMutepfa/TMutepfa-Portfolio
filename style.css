@@ -886,6 +886,12 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 0.95rem;
     }
 
+    /* Disable scroll animations on mobile to prevent flickering */
+    .fade-in-up {
+        animation: none !important;
+        opacity: 1;
+    }
+
     .hero {
         min-height: auto;
         padding: 100px 0 2rem 0;
