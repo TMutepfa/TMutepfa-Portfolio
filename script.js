@@ -38,6 +38,7 @@ class NetworkAnimation {
         this.connections = [];
         this.mousePos = { x: 0, y: 0 };
         this.isMobile = window.innerWidth <= 768;
+        this.resizeTimeout = null;
         
         this.init();
         this.setupEventListeners();
@@ -146,7 +147,12 @@ class NetworkAnimation {
     
     setupEventListeners() {
         window.addEventListener('resize', () => {
-            this.resizeCanvas();
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = setTimeout(() => {
+                if (!this.isMobile) {
+                    this.resizeCanvas();
+                }
+            }, 250);
         });
         
         window.addEventListener('mousemove', (e) => {
