@@ -342,6 +342,12 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateZ(0);
 }
 
+@media (max-width: 768px) {
+    .hub-center {
+        animation: none;
+    }
+}
+
 .connection-point {
     position: absolute;
     width: 60px;
@@ -365,11 +371,8 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 768px) {
     .connection-point {
-        width: 45px;
-        height: 45px;
-        font-size: 1rem;
-        animation: orbit 10s linear infinite;
-        transform: translate3d(-50%, -50%, 0) rotate(var(--angle)) translateY(-110px) rotate(calc(-1 * var(--angle)));
+        animation: none;
+        transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-110px) rotate(calc(-1 * var(--angle))) !important;
     }
 }
 
