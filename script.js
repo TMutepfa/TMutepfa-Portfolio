@@ -38,15 +38,24 @@ class NetworkAnimation {
         this.connections = [];
         this.mousePos = { x: 0, y: 0 };
         this.isMobile = window.innerWidth <= 768;
-        this.frameSkip = this.isMobile ? 2 : 1; // Skip frames on mobile
-        this.frameCount = 0;
-        this.lastFrameTime = 0;
-        this.targetFPS = this.isMobile ? 30 : 60;
-        this.frameInterval = 1000 / this.targetFPS;
         
         this.init();
         this.setupEventListeners();
-        this.animate();
+        
+        if (!this.isMobile) {
+            // Desktop: run continuous animation
+            this.lastFrameTime = 0;
+            this.targetFPS = 60;
+            this.frameInterval = 1000 / this.targetFPS;
+            this.animate();
+        } else {
+            // Mobile: draw static frame only
+            this.resizeCanvas();
+            this.createNodes();
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.drawConnections();
+            this.drawNodes();
+        }
     }
     
     init() {
@@ -60,7 +69,7 @@ class NetworkAnimation {
     }
     
     createNodes() {
-        const nodeCount = this.isMobile ? 25 : 50;
+        const nodeCount = this.isMobile ? 15 : 50;
         this.nodes = [];
         
         for (let i = 0; i < nodeCount; i++) {
@@ -122,7 +131,7 @@ class NetworkAnimation {
         requestAnimationFrame((currentTime) => {
             const elapsed = currentTime - this.lastFrameTime;
             
-            // Throttle frame updates on mobile
+            // Only update on desktop at 60 FPS
             if (elapsed >= this.frameInterval) {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 this.updateNodes();
