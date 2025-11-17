@@ -33,30 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
 class NetworkAnimation {
     constructor() {
         this.canvas = document.getElementById('networkCanvas');
-        this.ctx = this.canvas.getContext('2d', { alpha: true, antialias: false });
+        this.ctx = this.canvas.getContext('2d');
         this.nodes = [];
         this.connections = [];
         this.mousePos = { x: 0, y: 0 };
-        this.isMobile = window.innerWidth <= 768;
-        this.resizeTimeout = null;
         
         this.init();
         this.setupEventListeners();
-        
-        if (!this.isMobile) {
-            // Desktop: run continuous animation
-            this.lastFrameTime = 0;
-            this.targetFPS = 60;
-            this.frameInterval = 1000 / this.targetFPS;
-            this.animate();
-        } else {
-            // Mobile: draw static frame only
-            this.resizeCanvas();
-            this.createNodes();
-            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.drawConnections();
-            this.drawNodes();
-        }
+        this.animate();
     }
     
     init() {
@@ -70,17 +54,17 @@ class NetworkAnimation {
     }
     
     createNodes() {
-        const nodeCount = this.isMobile ? 15 : 50;
+        const nodeCount = 50;
         this.nodes = [];
         
         for (let i = 0; i < nodeCount; i++) {
             this.nodes.push({
                 x: Math.random() * this.canvas.width,
                 y: Math.random() * this.canvas.height,
-                vx: (Math.random() - 0.5) * 0.3,
-                vy: (Math.random() - 0.5) * 0.3,
-                radius: Math.random() * 2 + 0.5,
-                opacity: Math.random() * 0.4 + 0.15
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 3 + 1,
+                opacity: Math.random() * 0.5 + 0.2
             });
         }
     }
@@ -129,30 +113,16 @@ class NetworkAnimation {
     }
     
     animate() {
-        requestAnimationFrame((currentTime) => {
-            const elapsed = currentTime - this.lastFrameTime;
-            
-            // Only update on desktop at 60 FPS
-            if (elapsed >= this.frameInterval) {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                this.updateNodes();
-                this.drawConnections();
-                this.drawNodes();
-                this.lastFrameTime = currentTime;
-            }
-            
-            this.animate();
-        });
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.updateNodes();
+        this.drawConnections();
+        this.drawNodes();
+        requestAnimationFrame(() => this.animate());
     }
     
     setupEventListeners() {
         window.addEventListener('resize', () => {
-            clearTimeout(this.resizeTimeout);
-            this.resizeTimeout = setTimeout(() => {
-                if (!this.isMobile) {
-                    this.resizeCanvas();
-                }
-            }, 250);
+            this.resizeCanvas();
         });
         
         window.addEventListener('mousemove', (e) => {
